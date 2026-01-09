@@ -85,6 +85,73 @@ Dieses Projekt verwendet einen innovativen **Zwei-KI-Agenten-Workflow** für max
 | `PROMPTS.md` | Aktuelle Arbeitsanweisungen für Agent 2 | Agent 1 |
 | `OUTPUT.md` | Dokumentation der Änderungen | Agent 2 |
 | `TEST_WALKTHROUGH.md` | Manuelle Test-Checkliste | Mensch |
+| `docs/features/*/FEATURE_SPEC.md` | Feature-spezifische Specs | Agent 1 |
+
+---
+
+## 🌿 Feature-Branch Workflow
+
+Für jedes Feature wird ein eigener Branch mit eigener Spezifikation erstellt:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    FEATURE-BRANCH WORKFLOW                           │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│   1. NEUER FEATURE-BRANCH                                           │
+│      ┌─────────────────────────────────────────────────────────┐    │
+│      │  git checkout -b feature/[name]                         │    │
+│      └─────────────────────────────────────────────────────────┘    │
+│                             │                                       │
+│                             ▼                                       │
+│   2. FEATURE-SPEC ERSTELLEN (Agent 1)                               │
+│      ┌─────────────────────────────────────────────────────────┐    │
+│      │  docs/features/[name]/FEATURE_SPEC.md                   │    │
+│      │                                                         │    │
+│      │  Enthält NUR:                                           │    │
+│      │  • Ziel des Features                                    │    │
+│      │  • Betroffene Dateien                                   │    │
+│      │  • UI-Änderungen (ASCII-Mockup)                         │    │
+│      │  • Technische Details                                   │    │
+│      │  • Akzeptanzkriterien                                   │    │
+│      └─────────────────────────────────────────────────────────┘    │
+│                             │                                       │
+│                             ▼                                       │
+│   3. IMPLEMENTATION (Agent 2)                                       │
+│      ┌─────────────────────────────────────────────────────────┐    │
+│      │  Agent 2 bekommt als Kontext:                           │    │
+│      │  • docs/features/[name]/FEATURE_SPEC.md (PRIMÄR)        │    │
+│      │  • SPEC.md (als Referenz)                               │    │
+│      │  • UI_REFERENCE.md (als Referenz)                       │    │
+│      │                                                         │    │
+│      │  Agent 2 dokumentiert in OUTPUT.md                      │    │
+│      └─────────────────────────────────────────────────────────┘    │
+│                             │                                       │
+│                             ▼                                       │
+│   4. REVIEW & MERGE                                                 │
+│      ┌─────────────────────────────────────────────────────────┐    │
+│      │  • CI/CD läuft (Linting, Tests, Build)                  │    │
+│      │  • PR in dev Branch                                     │    │
+│      │  • Nach Tests: PR in main                               │    │
+│      └─────────────────────────────────────────────────────────┘    │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Wann bekommt Agent 2 welchen Kontext?
+
+| Situation | Kontext für Agent 2 |
+|-----------|---------------------|
+| **Neues Feature implementieren** | `FEATURE_SPEC.md` + relevante Source-Files |
+| **Bug in bestehendem Feature** | `FEATURE_SPEC.md` + `OUTPUT.md` vom letzten Run |
+| **Übergreifende Änderung** | `SPEC.md` + `UI_REFERENCE.md` + betroffene Files |
+| **Refactoring** | `SPEC.md` + alle betroffenen Source-Files |
+
+### Feature-Spec Template
+
+Siehe [docs/FEATURE_TEMPLATE.md](docs/FEATURE_TEMPLATE.md) für das Standard-Template.
+
+**Beispiel:** [docs/features/auth-persistence/FEATURE_SPEC.md](docs/features/auth-persistence/FEATURE_SPEC.md)
 
 ---
 
@@ -92,10 +159,21 @@ Dieses Projekt verwendet einen innovativen **Zwei-KI-Agenten-Workflow** für max
 
 ```
 copilot-desktop/
+├── .github/
+│   └── workflows/
+│       └── ci.yml          # CI/CD Pipeline
+├── docs/
+│   ├── FEATURE_TEMPLATE.md # Template für Feature-Specs
+│   └── features/           # Feature-spezifische Specs
+│       ├── auth-persistence/
+│       │   └── FEATURE_SPEC.md
+│       ├── dark-mode/
+│       └── ui-polish/
 ├── src/                    # React Frontend
 │   ├── components/         # UI-Komponenten
 │   ├── stores/             # Zustand State Management
 │   ├── services/           # API & Business Logic
+│   ├── test/               # Test Setup & Utilities
 │   └── types/              # TypeScript Types
 ├── src-tauri/              # Rust Backend (Tauri)
 │   └── src/                # Tauri Commands
@@ -136,6 +214,72 @@ main                    # Stabile Releases
 - **State Management**: Zustand
 - **Datenbank**: SQLite (via @tauri-apps/plugin-sql)
 - **Auth**: GitHub OAuth Device Flow
+- **Testing**: Vitest + React Testing Library
+- **Linting**: ESLint + Prettier
+- **CI/CD**: GitHub Actions
+
+---
+
+## 🔄 CI/CD Pipeline
+
+Bei jedem Push/PR auf `main` oder `dev` läuft automatisch:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        GITHUB ACTIONS CI                             │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌─────────────────────┐     ┌─────────────────────┐               │
+│  │  🔍 Frontend Lint   │     │  🦀 Rust Lint       │               │
+│  │  • ESLint           │     │  • cargo fmt        │               │
+│  │  • Prettier         │     │  • cargo clippy     │               │
+│  │  • TypeScript       │     │                     │               │
+│  └──────────┬──────────┘     └──────────┬──────────┘               │
+│             │                           │                           │
+│             └───────────┬───────────────┘                           │
+│                         │                                           │
+│                         ▼                                           │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                    🧪 Tests                                  │   │
+│  │  • Vitest (Frontend Unit Tests)                             │   │
+│  │  • cargo test (Rust Tests)                                  │   │
+│  │  • Coverage Report                                          │   │
+│  └─────────────────────────┬───────────────────────────────────┘   │
+│                             │                                       │
+│                             ▼                                       │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                    🏗️ Build Check                            │   │
+│  │  • vite build                                               │   │
+│  │  • cargo check                                              │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Lokale Checks (vor dem Commit)
+
+```bash
+# Linting
+pnpm lint              # ESLint
+pnpm lint:fix          # ESLint mit Auto-Fix
+
+# Formatting
+pnpm format            # Prettier (schreibt Dateien)
+pnpm format:check      # Prettier (nur prüfen)
+
+# Type Checking
+pnpm typecheck         # TypeScript ohne Build
+
+# Tests
+pnpm test              # Vitest im Watch-Mode
+pnpm test:unit         # Einmaliger Test-Run
+pnpm test:coverage     # Mit Coverage-Report
+
+# Rust (im src-tauri Ordner)
+cargo fmt              # Formatierung
+cargo clippy           # Linting
+cargo test             # Tests
+```
 
 ---
 
