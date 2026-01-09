@@ -4,6 +4,43 @@
 
 ---
 
+## 📤 OUTPUT-DOKUMENTATION (WICHTIG!)
+
+**Nach jeder Änderung musst du die Datei `OUTPUT.md` aktualisieren!**
+
+```markdown
+# OUTPUT.md Format
+
+## Iteration X - [Datum]
+
+### Durchgeführte Änderungen
+
+#### 1. [Komponente/Feature Name]
+- **Datei(en):** `src/path/to/file.ts`
+- **Änderung:** Kurze Beschreibung was geändert wurde
+- **Grund:** Warum die Änderung nötig war
+- **Status:** ✅ Fertig / ⚠️ Teilweise / ❌ Fehlgeschlagen
+
+#### 2. [Nächste Komponente]
+...
+
+### Offene Probleme
+- Problem 1...
+- Problem 2...
+
+### Nächste Schritte
+- [ ] Task 1
+- [ ] Task 2
+```
+
+**WICHTIG:** 
+- `OUTPUT.md` wird bei jeder neuen Iteration **komplett überschrieben** (nicht angehängt!)
+- Dokumentiere ALLE Änderungen die du machst
+- Bei Fehlern: Beschreibe was nicht funktioniert hat
+- Der Entwickler liest OUTPUT.md um zu verstehen was du gemacht hast
+
+---
+
 ## 🎯 Kontext für die KI
 
 **WICHTIG: Lies zuerst diese Dateien:**
