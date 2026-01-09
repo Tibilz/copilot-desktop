@@ -86,6 +86,7 @@ export const streamChatCompletion = async (
 
   if (!response.body) return;
 
+  const reader = response.body.getReader();
   const decoder = new TextDecoder();
 
   // eslint-disable-next-line no-constant-condition
