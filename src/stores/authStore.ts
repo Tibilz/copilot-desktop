@@ -1,3 +1,4 @@
+/* eslint-disable no-console, @typescript-eslint/no-explicit-any */
 // src/stores/authStore.ts
 import { create } from 'zustand';
 import { initiateDeviceFlow, pollForToken, fetchUser, DeviceCodeResponse, GitHubUser } from '../services/githubAuth';

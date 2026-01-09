@@ -14,7 +14,7 @@ export const MessageInput = () => {
 
     const handleStop = () => {
         // TODO: Implement stop functionality in chatStore/sessionManager
-        console.log("Stop requested (not implemented yet)");
+        // console.log("Stop requested (not implemented yet)");
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {

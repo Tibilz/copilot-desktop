@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { initDb } from './database';
 import { Chat, Message } from '../types/chat';
 

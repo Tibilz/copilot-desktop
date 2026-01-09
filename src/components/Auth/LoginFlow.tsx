@@ -7,15 +7,12 @@ import { openUrl } from '@tauri-apps/plugin-opener';
 export const LoginFlow = () => {
     const { startLogin, confirmLogin, deviceFlow, loading, error, cancelLogin } = useAuthStore();
 
-    // DEBUG LOGGING
-    console.log('[LoginFlow Render]', { loading, hasDeviceFlow: !!deviceFlow, error });
-
     // Auto-confirm login when device flow is active
     useEffect(() => {
         if (deviceFlow && !loading) {
             confirmLogin();
         }
-    }, [deviceFlow]);
+    }, [deviceFlow, loading, confirmLogin]);
 
     // 1. Loading state (only if no device flow yet)
     if (loading && !deviceFlow) {
@@ -95,7 +92,6 @@ export const LoginFlow = () => {
             </p>
             <button
                 onClick={() => {
-                    console.log('Login button clicked');
                     startLogin();
                 }}
                 disabled={loading}

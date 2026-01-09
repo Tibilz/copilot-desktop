@@ -33,7 +33,7 @@ export const Sidebar = () => {
     };
 
     const createSwarm = async () => {
-        let configs = await swarmService.getAllConfigs();
+        const configs = await swarmService.getAllConfigs();
         let configId = '';
         if (configs.length === 0) {
             configId = await swarmService.createConfig("Default Parallel", "parallel");

@@ -1,3 +1,4 @@
+/* eslint-disable no-console, @typescript-eslint/no-explicit-any */
 // src/services/githubAuth.ts
 // import { fetch } from '@tauri-apps/plugin-http'; // Mocking, so unused
 

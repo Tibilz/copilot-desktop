@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { MessageInput } from './MessageInput';
 import { useChatStore } from '../../stores/chatStore';
 import { MessageBubble } from './MessageBubble';
@@ -6,7 +6,7 @@ import { SwarmExecutionView } from '../Swarm/SwarmExecutionView';
 
 export const ChatView = () => {
     const { messages, activeChatId } = useChatStore();
-    const currentMessages = activeChatId ? messages[activeChatId] || [] : [];
+    const currentMessages = useMemo(() => activeChatId ? messages[activeChatId] || [] : [], [activeChatId, messages]);
     const bottomRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {

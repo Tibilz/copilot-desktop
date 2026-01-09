@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { tokenPool } from './tokenPool';
 import { streamChatCompletion } from './copilotApi';
 import { Message } from '../types/chat';
