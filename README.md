@@ -13,6 +13,24 @@ Eine Desktop-Anwendung, die die ChatGPT Desktop-Oberfläche nachbildet, aber Git
 
 ---
 
+## 🚀 Quick Start für neue Entwickler
+
+```bash
+# 1. Repository klonen
+git clone https://github.com/Tibilz/copilot-desktop.git
+cd copilot-desktop
+
+# 2. Dependencies installieren
+pnpm install
+
+# 3. AGENTS.md lesen und zwei KI-Chats starten
+# 4. Los geht's!
+```
+
+**👉 Lies [AGENTS.md](AGENTS.md) für den kompletten KI-Agenten Setup Guide!**
+
+---
+
 ## 🤖 Entwicklungs-Workflow: Dual-Agent Architektur
 
 Dieses Projekt verwendet einen innovativen **Zwei-KI-Agenten-Workflow** für maximale Effizienz und Qualität:
@@ -321,10 +339,19 @@ Siehe [PROMPTS.md](PROMPTS.md) für die aktuelle Iteration und offene Tasks.
 
 ## 📚 Dokumentation
 
+### Für Entwickler
+- **[AGENTS.md](AGENTS.md)** - 🚀 **START HIER!** KI-Agenten Setup Guide
 - [SPEC.md](SPEC.md) - Vollständige technische Spezifikation
 - [UI_REFERENCE.md](UI_REFERENCE.md) - UI Design mit ASCII-Mockups
-- [PROMPTS.md](PROMPTS.md) - Aktuelle Arbeitsanweisungen
-- [TEST_WALKTHROUGH.md](TEST_WALKTHROUGH.md) - Manuelle Tests
+
+### Workflow-Dateien
+- [PROMPTS.md](PROMPTS.md) - Aktuelle Arbeitsanweisungen (für Code Executor)
+- [OUTPUT.md](OUTPUT.md) - Letzte Änderungen (vom Code Executor)
+- [TEST_WALKTHROUGH.md](TEST_WALKTHROUGH.md) - Manuelle Test-Checkliste
+
+### Feature-Specs
+- [docs/features/](docs/features/) - Feature-spezifische Spezifikationen
+- [docs/FEATURE_TEMPLATE.md](docs/FEATURE_TEMPLATE.md) - Template für neue Features
 
 ---
 
