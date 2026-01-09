@@ -16,12 +16,13 @@ interface ChatRequest {
 }
 
 // Token Cache: Map<OAuthToken, { token: CopilotToken, expiresAt: number }>
-const tokenCache = new Map<string, { token: string, expiresAt: number }>();
+const tokenCache = new Map<string, { token: string; expiresAt: number }>();
 
 export const getCopilotToken = async (oauthToken: string): Promise<string> => {
     // Check cache
     const cached = tokenCache.get(oauthToken);
-    if (cached && cached.expiresAt > Date.now() + 60000) { // Buffer 1 min
+    if (cached && cached.expiresAt > Date.now() + 60000) {
+        // Buffer 1 min
         return cached.token;
     }
 
@@ -29,10 +30,10 @@ export const getCopilotToken = async (oauthToken: string): Promise<string> => {
         const response = await fetch('https://api.github.com/copilot_internal/v2/token', {
             method: 'GET',
             headers: {
-                'Authorization': `token ${oauthToken}`,
-                'Accept': 'application/json',
-                'User-Agent': 'GitHubCopilotChat/0.11.1'
-            }
+                Authorization: `token ${oauthToken}`,
+                Accept: 'application/json',
+                'User-Agent': 'GitHubCopilotChat/0.11.1',
+            },
         });
 
         if (!response.ok) {
@@ -46,7 +47,7 @@ export const getCopilotToken = async (oauthToken: string): Promise<string> => {
         // Cache it
         tokenCache.set(oauthToken, {
             token: data.token,
-            expiresAt: data.expires_at * 1000
+            expiresAt: data.expires_at * 1000,
         });
 
         return data.token;
@@ -67,13 +68,13 @@ export const streamChatCompletion = async (
     const response = await fetch(`${BASE_URL}/chat/completions`, {
         method: 'POST',
         headers: {
-            'Authorization': `Bearer ${copilotToken}`,
+            Authorization: `Bearer ${copilotToken}`,
             'Content-Type': 'application/json',
-            'Accept': 'text/event-stream',
+            Accept: 'text/event-stream',
             'Editor-Version': 'vscode/1.85.1',
             'Editor-Plugin-Version': 'copilot-chat/0.11.1',
             'User-Agent': 'GitHubCopilotChat/0.11.1',
-            'Copilot-Integration-Id': 'vscode-chat'
+            'Copilot-Integration-Id': 'vscode-chat',
         },
         body: JSON.stringify(request),
     });

@@ -11,7 +11,7 @@ export class SessionManager {
     // private activeStreams: Map<string, AbortController> = new Map();
     private chatStates: Map<string, ChatState> = new Map();
     private listeners: Set<StateListener> = new Set();
-    
+
     // Minimal queue placeholder
     // private queue: Array<{ chatId: string, task: () => Promise<void> }> = [];
 
@@ -26,7 +26,7 @@ export class SessionManager {
 
     private setState(chatId: string, state: ChatState) {
         this.chatStates.set(chatId, state);
-        this.listeners.forEach(l => l(chatId, state));
+        this.listeners.forEach((l) => l(chatId, state));
     }
 
     getState(chatId: string): ChatState {
@@ -39,7 +39,6 @@ export class SessionManager {
         history: Message[],
         onDelta: (chunk: string) => void
     ): Promise<string> {
-
         this.setState(chatId, 'pending');
 
         try {
@@ -50,16 +49,16 @@ export class SessionManager {
             this.setState(chatId, 'streaming');
 
             // 2. Prepare Request
-            const apiMessages = history.map(m => ({
+            const apiMessages = history.map((m) => ({
                 role: m.role,
-                content: m.content
+                content: m.content,
             }));
 
             const request = {
                 model,
                 messages: apiMessages,
                 stream: true,
-                temperature: 0.1
+                temperature: 0.1,
             };
 
             let fullResponse = '';
@@ -72,7 +71,6 @@ export class SessionManager {
 
             this.setState(chatId, 'idle');
             return fullResponse;
-
         } catch (error: any) {
             console.error(`SessionManager Error for Chat ${chatId}:`, error);
             this.setState(chatId, 'error');

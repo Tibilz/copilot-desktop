@@ -48,10 +48,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
         await chatService.createChat(newChat);
 
-        set(state => ({
+        set((state) => ({
             chats: [newChat, ...state.chats],
             activeChatId: newChat.id,
-            messages: { ...state.messages, [newChat.id]: [] }
+            messages: { ...state.messages, [newChat.id]: [] },
         }));
         return newChat.id;
     },
@@ -63,7 +63,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
             // Load messages properly if not in memory
             try {
                 const msgs = await chatService.getMessages(chatId);
-                set(state => ({ messages: { ...state.messages, [chatId]: msgs } }));
+                set((state) => ({ messages: { ...state.messages, [chatId]: msgs } }));
             } catch (e) {
                 console.error(e);
             }
@@ -79,13 +79,13 @@ export const useChatStore = create<ChatState>((set, get) => ({
         }
 
         const currentChatId = chatId!;
-        const currentChat = get().chats.find(c => c.id === currentChatId);
+        const currentChat = get().chats.find((c) => c.id === currentChatId);
 
         const userMsg: Message = {
             id: uuidv4(),
             role: 'user',
             content,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
         };
 
         await chatService.addMessage(currentChatId, userMsg);
@@ -95,24 +95,24 @@ export const useChatStore = create<ChatState>((set, get) => ({
             id: assistantMsgId,
             role: 'assistant',
             content: '',
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
         };
 
         // Optimistic update
         const currentMessages = messages[currentChatId] || [];
         const newMessages = [...currentMessages, userMsg, assistantMsg];
 
-        set(state => ({
+        set((state) => ({
             messages: { ...state.messages, [currentChatId]: newMessages },
-            isLoading: true
+            isLoading: true,
         }));
 
         // Auto-update title if it's the first message
         if (currentChat && currentChat.title === 'Neuer Chat' && currentMessages.length === 0) {
             const newTitle = content.slice(0, 30) + (content.length > 30 ? '...' : '');
             await chatService.updateChat({ ...currentChat, title: newTitle });
-            set(state => ({
-                chats: state.chats.map(c => c.id === currentChatId ? { ...c, title: newTitle } : c)
+            set((state) => ({
+                chats: state.chats.map((c) => (c.id === currentChatId ? { ...c, title: newTitle } : c)),
             }));
         }
 
@@ -130,24 +130,29 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
                 useSwarmStore.getState().startExecution(configId, content);
 
-                fullResponse = await swarmService.runSwarm(configId, currentChatId, historyForApi, (workerId, chunk) => {
-                    const prev = workerBuffers.get(workerId) || '';
-                    workerBuffers.set(workerId, prev + chunk);
+                fullResponse = await swarmService.runSwarm(
+                    configId,
+                    currentChatId,
+                    historyForApi,
+                    (workerId, chunk) => {
+                        const prev = workerBuffers.get(workerId) || '';
+                        workerBuffers.set(workerId, prev + chunk);
 
-                    useSwarmStore.getState().updateWorkerResponse(workerId, chunk);
+                        useSwarmStore.getState().updateWorkerResponse(workerId, chunk);
 
-                    const liveText = Array.from(workerBuffers.entries())
-                        .map(([wId, content]) => `### Worker ${wId.slice(0, 4)}\n${content}`)
-                        .join('\n\n---\n\n');
+                        const liveText = Array.from(workerBuffers.entries())
+                            .map(([wId, content]) => `### Worker ${wId.slice(0, 4)}\n${content}`)
+                            .join('\n\n---\n\n');
 
-                    set(state => {
-                        const chatMsgs = state.messages[currentChatId] || [];
-                        const updatedMsgs = chatMsgs.map(m =>
-                            m.id === assistantMsgId ? { ...m, content: liveText } : m
-                        );
-                        return { messages: { ...state.messages, [currentChatId]: updatedMsgs } };
-                    });
-                });
+                        set((state) => {
+                            const chatMsgs = state.messages[currentChatId] || [];
+                            const updatedMsgs = chatMsgs.map((m) =>
+                                m.id === assistantMsgId ? { ...m, content: liveText } : m
+                            );
+                            return { messages: { ...state.messages, [currentChatId]: updatedMsgs } };
+                        });
+                    }
+                );
 
                 useSwarmStore.getState().completeExecution(fullResponse);
             } else {
@@ -157,9 +162,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
                     historyForApi,
                     (chunk) => {
                         fullResponse += chunk;
-                        set(state => {
+                        set((state) => {
                             const chatMsgs = state.messages[currentChatId] || [];
-                            const updatedMsgs = chatMsgs.map(m =>
+                            const updatedMsgs = chatMsgs.map((m) =>
                                 m.id === assistantMsgId ? { ...m, content: fullResponse } : m
                             );
                             return { messages: { ...state.messages, [currentChatId]: updatedMsgs } };
@@ -170,12 +175,13 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
             // Save final response to DB
             await chatService.updateMessageContent(assistantMsgId, fullResponse);
-
         } catch (e: any) {
-            set(state => {
+            set((state) => {
                 const chatMsgs = state.messages[currentChatId] || [];
-                const updatedMsgs = chatMsgs.map(m =>
-                    m.id === assistantMsgId ? { ...m, content: m.content + '\n[Error: ' + e.message + ']' } : m
+                const updatedMsgs = chatMsgs.map((m) =>
+                    m.id === assistantMsgId
+                        ? { ...m, content: m.content + '\n[Error: ' + e.message + ']' }
+                        : m
                 );
                 return { messages: { ...state.messages, [currentChatId]: updatedMsgs } };
             });
@@ -186,7 +192,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
     clearChat: () => {
         // Clear current chat messages logic
-        set(state => {
+        set((state) => {
             if (!state.activeChatId) return {};
             return { messages: { ...state.messages, [state.activeChatId]: [] } };
         });
@@ -195,49 +201,52 @@ export const useChatStore = create<ChatState>((set, get) => ({
     deleteChat: async (chatId: string) => {
         try {
             await chatService.deleteChat(chatId);
-            set(state => {
-                const newChats = state.chats.filter(c => c.id !== chatId);
-                const newActiveId = state.activeChatId === chatId
-                    ? (newChats.length > 0 ? newChats[0].id : null)
-                    : state.activeChatId;
+            set((state) => {
+                const newChats = state.chats.filter((c) => c.id !== chatId);
+                const newActiveId =
+                    state.activeChatId === chatId
+                        ? newChats.length > 0
+                            ? newChats[0].id
+                            : null
+                        : state.activeChatId;
                 return {
                     chats: newChats,
-                    activeChatId: newActiveId
+                    activeChatId: newActiveId,
                 };
             });
         } catch (e) {
-            console.error("Failed to delete chat", e);
+            console.error('Failed to delete chat', e);
         }
     },
 
     renameChat: async (chatId: string, newTitle: string) => {
-        const chat = get().chats.find(c => c.id === chatId);
+        const chat = get().chats.find((c) => c.id === chatId);
         if (!chat) return;
 
         const updatedChat = { ...chat, title: newTitle };
         try {
             await chatService.updateChat(updatedChat);
-            set(state => ({
-                chats: state.chats.map(c => c.id === chatId ? updatedChat : c)
+            set((state) => ({
+                chats: state.chats.map((c) => (c.id === chatId ? updatedChat : c)),
             }));
         } catch (e) {
-            console.error("Failed to rename chat", e);
+            console.error('Failed to rename chat', e);
         }
     },
 
     updateChatModel: async (chatId: string, model: string) => {
         // Find chat
-        const chat = get().chats.find(c => c.id === chatId);
+        const chat = get().chats.find((c) => c.id === chatId);
         if (!chat) return;
 
         const updatedChat = { ...chat, model };
         try {
             await chatService.updateChat(updatedChat);
-            set(state => ({
-                chats: state.chats.map(c => c.id === chatId ? updatedChat : c)
+            set((state) => ({
+                chats: state.chats.map((c) => (c.id === chatId ? updatedChat : c)),
             }));
         } catch (e) {
-            console.error("Failed to update chat model", e);
+            console.error('Failed to update chat model', e);
         }
-    }
+    },
 }));

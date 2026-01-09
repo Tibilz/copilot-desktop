@@ -1,7 +1,13 @@
 /* eslint-disable no-console, @typescript-eslint/no-explicit-any */
 // src/stores/authStore.ts
 import { create } from 'zustand';
-import { initiateDeviceFlow, pollForToken, fetchUser, DeviceCodeResponse, GitHubUser } from '../services/githubAuth';
+import {
+    initiateDeviceFlow,
+    pollForToken,
+    fetchUser,
+    DeviceCodeResponse,
+    GitHubUser,
+} from '../services/githubAuth';
 import { invoke } from '@tauri-apps/api/core';
 import { tokenPool } from '../services/tokenPool';
 
@@ -45,14 +51,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                 } catch (userError: any) {
                     console.error('[AuthStore] Token validation failed:', userError);
                     // Only delete if explicitly unauthorized (401), not on network error
-                    if (userError.message?.includes('401') || userError.message?.includes('Bad credentials')) {
+                    if (
+                        userError.message?.includes('401') ||
+                        userError.message?.includes('Bad credentials')
+                    ) {
                         console.warn('[AuthStore] Invalid token, clearing...');
                         await invoke('delete_token', { service: SERVICE, user: USER_KEY }).catch(() => { });
                         set({ loading: false, isAuthenticated: false, token: null });
                     } else {
                         // Network error? Keep token but set error state or retry
                         console.warn('[AuthStore] Validation error (network?), keeping token.');
-                        // For now, fail soft -> we have token but can't verify. 
+                        // For now, fail soft -> we have token but can't verify.
                         // Maybe let them in? Or stay in loading?
                         // Safe bet: Assume unauthed but don't delete token yet.
                         set({ loading: false, isAuthenticated: false, error: 'Verbindung fehlgeschlagen' });
@@ -120,22 +129,24 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                         const user = await fetchUser(token);
 
                         // Add to TokenPool (Database)
-                        // Note: For now we default is_primary to true if it's the first one, 
-                        // but logic here just adds it. 
+                        // Note: For now we default is_primary to true if it's the first one,
+                        // but logic here just adds it.
                         // We also need to get the user's login.
-                        await tokenPool.addAccount({
-                            username: user.login,
-                            access_token: token,
-                            avatar_url: user.avatar_url,
-                            is_primary: true // simplified
-                        }).catch(err => console.error("Failed to add to token pool DB:", err));
+                        await tokenPool
+                            .addAccount({
+                                username: user.login,
+                                access_token: token,
+                                avatar_url: user.avatar_url,
+                                is_primary: true, // simplified
+                            })
+                            .catch((err) => console.error('Failed to add to token pool DB:', err));
 
                         set({
                             token,
                             user,
                             isAuthenticated: true,
                             loading: false,
-                            deviceFlow: null
+                            deviceFlow: null,
                         });
                     } else {
                         set({ error: result.error_description || 'Unknown error', loading: false });
@@ -147,7 +158,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             };
 
             pollLoop();
-
         } catch (e: any) {
             set({ error: e.message, loading: false });
         }
@@ -164,7 +174,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             user: null,
             token: null,
             deviceFlow: null,
-            error: null
+            error: null,
         });
     },
 }));

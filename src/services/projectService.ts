@@ -13,13 +13,15 @@ export interface Project {
 export const projectService = {
     async getProjects(): Promise<Project[]> {
         const db = await initDb();
-        const rows = await db.select<any[]>('SELECT * FROM projects ORDER BY sort_order ASC, created_at DESC');
-        return rows.map(r => ({
+        const rows = await db.select<any[]>(
+            'SELECT * FROM projects ORDER BY sort_order ASC, created_at DESC'
+        );
+        return rows.map((r) => ({
             id: r.id,
             name: r.name,
             createdAt: r.created_at,
             updatedAt: r.updated_at,
-            sortOrder: r.sort_order
+            sortOrder: r.sort_order,
         }));
     },
 
@@ -40,5 +42,5 @@ export const projectService = {
     async moveChatToProject(chatId: string, projectId: string | null): Promise<void> {
         const db = await initDb();
         await db.execute('UPDATE chats SET project_id = ? WHERE id = ?', [projectId, chatId]);
-    }
+    },
 };

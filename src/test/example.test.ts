@@ -26,11 +26,11 @@ describe('Auth Store', () => {
 
     it('should set isLoading while checking auth', async () => {
         // const { result } = renderHook(() => useAuthStore());
-        // 
+        //
         // await act(async () => {
         //   result.current.checkAuth();
         // });
-        // 
+        //
         // expect(result.current.isLoading).toBe(false);
 
         expect(true).toBe(true);
@@ -38,11 +38,11 @@ describe('Auth Store', () => {
 
     it('should clear state on logout', async () => {
         // const { result } = renderHook(() => useAuthStore());
-        // 
+        //
         // await act(async () => {
         //   result.current.logout();
         // });
-        // 
+        //
         // expect(result.current.isAuthenticated).toBe(false);
         // expect(result.current.user).toBeNull();
         // expect(result.current.token).toBeNull();

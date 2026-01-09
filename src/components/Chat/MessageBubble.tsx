@@ -11,7 +11,7 @@ interface MessageBubbleProps {
     message: Message;
 }
 
-const CodeBlock = ({ language, children }: { language: string, children: string }) => {
+const CodeBlock = ({ language, children }: { language: string; children: string }) => {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = () => {
@@ -21,12 +21,12 @@ const CodeBlock = ({ language, children }: { language: string, children: string 
     };
 
     return (
-        <div className="relative group my-4 rounded-lg overflow-hidden">
-            <div className="absolute top-2 right-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                <span className="text-xs text-gray-400 bg-black/50 px-2 py-1 rounded">{language}</span>
+        <div className="group relative my-4 overflow-hidden rounded-lg">
+            <div className="absolute right-2 top-2 z-10 flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+                <span className="rounded bg-black/50 px-2 py-1 text-xs text-gray-400">{language}</span>
                 <button
                     onClick={handleCopy}
-                    className="p-1.5 bg-bg-secondary hover:bg-bg-primary rounded text-text-secondary hover:text-text-primary transition-colors border border-border"
+                    className="rounded border border-border bg-bg-secondary p-1.5 text-text-secondary transition-colors hover:bg-bg-primary hover:text-text-primary"
                     title="Kopieren"
                 >
                     {copied ? <Check size={14} className="text-accent" /> : <Copy size={14} />}
@@ -49,8 +49,8 @@ export const MessageBubble = ({ message }: MessageBubbleProps) => {
         <div className={`flex w-full ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div
                 className={`max-w-[85%] rounded-2xl px-5 py-3 ${message.role === 'user'
-                    ? 'bg-bg-secondary text-text-primary rounded-tr-sm'
-                    : 'bg-transparent text-text-primary text-left prose dark:prose-invert max-w-none w-full'
+                        ? 'rounded-tr-sm bg-bg-secondary text-text-primary'
+                        : 'prose w-full max-w-none bg-transparent text-left text-text-primary dark:prose-invert'
                     }`}
             >
                 {message.role === 'user' ? (
@@ -66,7 +66,7 @@ export const MessageBubble = ({ message }: MessageBubbleProps) => {
                                         e.preventDefault();
                                         if (href) openUrl(href);
                                     }}
-                                    className="text-accent hover:underline cursor-pointer"
+                                    className="cursor-pointer text-accent hover:underline"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
@@ -79,11 +79,12 @@ export const MessageBubble = ({ message }: MessageBubbleProps) => {
                                 const codeString = String(children).replace(/\n$/, '');
 
                                 return !inline && match ? (
-                                    <CodeBlock language={match[1]}>
-                                        {codeString}
-                                    </CodeBlock>
+                                    <CodeBlock language={match[1]}>{codeString}</CodeBlock>
                                 ) : (
-                                    <code className={`${className} bg-bg-secondary px-1.5 py-0.5 rounded text-sm`} {...props}>
+                                    <code
+                                        className={`${className} rounded bg-bg-secondary px-1.5 py-0.5 text-sm`}
+                                        {...props}
+                                    >
                                         {children}
                                     </code>
                                 );

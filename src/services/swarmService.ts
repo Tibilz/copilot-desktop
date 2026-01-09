@@ -8,7 +8,7 @@ export interface SwarmWorker {
     id: string;
     config_id?: string;
     model: string;
-    role: string;  // System Prompt / Role Description
+    role: string; // System Prompt / Role Description
     name: string;
     weight?: number;
 }
@@ -56,10 +56,13 @@ Worker Responses:
 Create a comprehensive final response that combines the best insights from each worker. Do not mention the workers or the aggregation process.`;
 
 export class SwarmService {
-
     // --- Configuration Management ---
 
-    async createConfig(name: string, strategy: SwarmStrategy, controllerModel: string = 'gpt-4o'): Promise<string> {
+    async createConfig(
+        name: string,
+        strategy: SwarmStrategy,
+        controllerModel: string = 'gpt-4o'
+    ): Promise<string> {
         const db = await initDb();
         const id = uuidv4();
         await db.execute(
@@ -69,12 +72,17 @@ export class SwarmService {
         return id;
     }
 
-    async addWorker(configId: string, _name: string, roleSystemPrompt: string, model: string = 'gpt-4o'): Promise<string> {
+    async addWorker(
+        configId: string,
+        _name: string,
+        roleSystemPrompt: string,
+        model: string = 'gpt-4o'
+    ): Promise<string> {
         const db = await initDb();
         const id = uuidv4();
         await db.execute(
             'INSERT INTO swarm_workers (id, config_id, model, role) VALUES (?, ?, ?, ?)',
-            [id, configId, model, roleSystemPrompt]  // Using logic that role column stores system prompt
+            [id, configId, model, roleSystemPrompt] // Using logic that role column stores system prompt
         );
         return id;
     }
@@ -84,16 +92,18 @@ export class SwarmService {
         const configs = await db.select<any[]>('SELECT * FROM swarm_configs WHERE id = ?', [configId]);
         if (configs.length === 0) return null;
 
-        const workers = await db.select<any[]>('SELECT * FROM swarm_workers WHERE config_id = ?', [configId]);
+        const workers = await db.select<any[]>('SELECT * FROM swarm_workers WHERE config_id = ?', [
+            configId,
+        ]);
         return {
             ...configs[0],
-            workers: workers.map(w => ({
+            workers: workers.map((w) => ({
                 id: w.id,
                 config_id: w.config_id,
                 model: w.model,
                 role: w.role, // System Prompt
-                name: w.role.substring(0, 20) // derived name or add column later
-            }))
+                name: w.role.substring(0, 20), // derived name or add column later
+            })),
         } as SwarmConfig;
     }
 
@@ -102,21 +112,22 @@ export class SwarmService {
         const configs = await db.select<any[]>('SELECT * FROM swarm_configs');
         const results = [];
         for (const c of configs) {
-            const workers = await db.select<any[]>('SELECT * FROM swarm_workers WHERE config_id = ?', [c.id]);
+            const workers = await db.select<any[]>('SELECT * FROM swarm_workers WHERE config_id = ?', [
+                c.id,
+            ]);
             results.push({
                 ...c,
-                workers: workers.map(w => ({
+                workers: workers.map((w) => ({
                     id: w.id,
                     config_id: w.config_id,
                     model: w.model,
                     role: w.role,
-                    name: w.role.substring(0, 20)
-                }))
+                    name: w.role.substring(0, 20),
+                })),
             });
         }
         return results;
     }
-
 
     // --- Execution ---
 
@@ -152,7 +163,7 @@ export class SwarmService {
             const workerChatId = `${mainChatId}_${worker.id}`;
             const messages = [
                 { id: 'sys', role: 'system' as const, content: worker.role, createdAt: '' },
-                ...history.filter(m => m.role !== 'system')
+                ...history.filter((m) => m.role !== 'system'),
             ];
 
             let content = '';
@@ -174,33 +185,50 @@ export class SwarmService {
         onUpdate: (workerId: string, content: string) => void
     ): Promise<string> {
         const lastUserMessage = history[history.length - 1];
-        if (!lastUserMessage || lastUserMessage.role !== 'user') return "Error: Last message must be user.";
+        if (!lastUserMessage || lastUserMessage.role !== 'user')
+            return 'Error: Last message must be user.';
 
         // 1. Task Analysis
-        const prompt = TASK_ANALYSIS_PROMPT
-            .replace('{{workers}}', JSON.stringify(config.workers.map(w => ({ id: w.id, role: w.role }))))
-            .replace('{{query}}', lastUserMessage.content);
+        const prompt = TASK_ANALYSIS_PROMPT.replace(
+            '{{workers}}',
+            JSON.stringify(config.workers.map((w) => ({ id: w.id, role: w.role })))
+        ).replace('{{query}}', lastUserMessage.content);
 
         let analysisResponse = '';
         try {
-            await sessionManager.sendMessage(`${mainChatId}_ctrl`, config.controller_model, [
-                { id: 'sys', role: 'system' as const, content: 'You are a task coordinator which outputs JSON.', createdAt: '' },
-                { id: 'u', role: 'user' as const, content: prompt, createdAt: '' }
-            ], (chunk) => analysisResponse += chunk);
+            await sessionManager.sendMessage(
+                `${mainChatId}_ctrl`,
+                config.controller_model,
+                [
+                    {
+                        id: 'sys',
+                        role: 'system' as const,
+                        content: 'You are a task coordinator which outputs JSON.',
+                        createdAt: '',
+                    },
+                    { id: 'u', role: 'user' as const, content: prompt, createdAt: '' },
+                ],
+                (chunk) => (analysisResponse += chunk)
+            );
 
             const jsonStr = analysisResponse.replace(/```json|```/g, '').trim();
             const subtasks = JSON.parse(jsonStr).subtasks;
 
             // 2. Dispatch
             const promises = subtasks.map(async (task: any) => {
-                const worker = config.workers.find(w => w.id === task.workerId);
+                const worker = config.workers.find((w) => w.id === task.workerId);
                 if (!worker) return null;
 
                 const workerChatId = `${mainChatId}_${worker.id}`;
                 const workerMessages = [
                     { id: 'sys', role: 'system' as const, content: worker.role, createdAt: '' },
-                    ...history.filter(m => m.role !== 'system').slice(0, -1),
-                    { id: uuidv4(), role: 'user' as const, content: `Original Query: ${lastUserMessage.content}\n\nYour Subtask: ${task.task}`, createdAt: '' }
+                    ...history.filter((m) => m.role !== 'system').slice(0, -1),
+                    {
+                        id: uuidv4(),
+                        role: 'user' as const,
+                        content: `Original Query: ${lastUserMessage.content}\n\nYour Subtask: ${task.task}`,
+                        createdAt: '',
+                    },
                 ];
 
                 let content = '';
@@ -211,31 +239,46 @@ export class SwarmService {
                 return { worker, content };
             });
 
-            const results = (await Promise.all(promises)).filter(r => r !== null) as { worker: SwarmWorker, content: string }[];
+            const results = (await Promise.all(promises)).filter((r) => r !== null) as {
+                worker: SwarmWorker;
+                content: string;
+            }[];
             return this.aggregateResults(config, mainChatId, history, results);
-
         } catch (e) {
-            console.error("Parallel execution failed, falling back to consensus", e);
+            console.error('Parallel execution failed, falling back to consensus', e);
             // Fallback
             return this.executeConsensus(config, mainChatId, history, onUpdate);
         }
     }
 
-    private async aggregateResults(config: SwarmConfig, mainChatId: string, history: Message[], results: { worker: SwarmWorker, content: string }[]) {
+    private async aggregateResults(
+        config: SwarmConfig,
+        mainChatId: string,
+        history: Message[],
+        results: { worker: SwarmWorker; content: string }[]
+    ) {
         const lastUserMessage = history[history.length - 1];
-        const responsesText = results.map(r => `Worker: ${r.worker.name || r.worker.role}\nResponse: ${r.content}`).join('\n\n');
+        const responsesText = results
+            .map((r) => `Worker: ${r.worker.name || r.worker.role}\nResponse: ${r.content}`)
+            .join('\n\n');
 
-        const prompt = AGGREGATION_PROMPT
-            .replace('{{query}}', lastUserMessage ? lastUserMessage.content : '')
-            .replace('{{responses}}', responsesText);
+        const prompt = AGGREGATION_PROMPT.replace(
+            '{{query}}',
+            lastUserMessage ? lastUserMessage.content : ''
+        ).replace('{{responses}}', responsesText);
 
         let finalResponse = '';
-        await sessionManager.sendMessage(`${mainChatId}_agg`, config.controller_model, [
-            { id: 'sys', role: 'system' as const, content: 'You are an aggregator.', createdAt: '' },
-            { id: 'u', role: 'user' as const, content: prompt, createdAt: '' }
-        ], (chunk) => {
-            finalResponse += chunk;
-        });
+        await sessionManager.sendMessage(
+            `${mainChatId}_agg`,
+            config.controller_model,
+            [
+                { id: 'sys', role: 'system' as const, content: 'You are an aggregator.', createdAt: '' },
+                { id: 'u', role: 'user' as const, content: prompt, createdAt: '' },
+            ],
+            (chunk) => {
+                finalResponse += chunk;
+            }
+        );
 
         return finalResponse;
     }

@@ -25,60 +25,59 @@ export const MessageInput = () => {
     };
 
     return (
-        <div className="max-w-3xl mx-auto w-full p-4">
-            <div className="bg-bg-secondary rounded-3xl border border-border p-3 focus-within:border-accent shadow-sm relative">
+        <div className="mx-auto w-full max-w-3xl p-4">
+            <div className="relative rounded-3xl border border-border bg-bg-secondary p-3 shadow-sm focus-within:border-accent">
                 <textarea
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="Stelle irgendeine Frage"
-                    className="w-full bg-transparent outline-none resize-none min-h-[44px] max-h-[200px] pl-2 pr-10 py-2 text-text-primary placeholder:text-text-secondary"
+                    className="max-h-[200px] min-h-[44px] w-full resize-none bg-transparent py-2 pl-2 pr-10 text-text-primary outline-none placeholder:text-text-secondary"
                     rows={1}
                 />
 
-                <div className="flex items-center justify-between mt-2 pl-1 pr-1">
+                <div className="mt-2 flex items-center justify-between pl-1 pr-1">
                     <div className="flex items-center gap-1">
-                        <button className="p-2 text-text-secondary hover:bg-bg-primary hover:text-text-primary rounded-full transition-colors">
-                            <Paperclip className="w-5 h-5" />
+                        <button className="rounded-full p-2 text-text-secondary transition-colors hover:bg-bg-primary hover:text-text-primary">
+                            <Paperclip className="h-5 w-5" />
                         </button>
-                        <button className="p-2 text-text-secondary hover:bg-bg-primary hover:text-text-primary rounded-full transition-colors">
-                            <Globe className="w-5 h-5" />
+                        <button className="rounded-full p-2 text-text-secondary transition-colors hover:bg-bg-primary hover:text-text-primary">
+                            <Globe className="h-5 w-5" />
                         </button>
-                        <button className="p-2 text-text-secondary hover:bg-bg-primary hover:text-text-primary rounded-full transition-colors">
-                            <Lightbulb className="w-5 h-5" />
+                        <button className="rounded-full p-2 text-text-secondary transition-colors hover:bg-bg-primary hover:text-text-primary">
+                            <Lightbulb className="h-5 w-5" />
                         </button>
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <button className="p-2 text-text-primary hover:bg-bg-primary rounded-full bg-transparent">
-                            <Mic className="w-5 h-5" />
+                        <button className="rounded-full bg-transparent p-2 text-text-primary hover:bg-bg-primary">
+                            <Mic className="h-5 w-5" />
                         </button>
 
                         {isLoading ? (
                             <button
                                 onClick={handleStop}
-                                className="p-2 bg-red-500 text-white rounded-full hover:opacity-90 transition-opacity"
+                                className="rounded-full bg-red-500 p-2 text-white transition-opacity hover:opacity-90"
                                 title="Stop generation"
                             >
-                                <Square className="w-5 h-5 fill-current" />
+                                <Square className="h-5 w-5 fill-current" />
                             </button>
                         ) : (
                             <button
                                 onClick={handleSend}
                                 disabled={!content.trim()}
-                                className="p-2 bg-text-primary text-bg-primary rounded-full hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                                className="rounded-full bg-text-primary p-2 text-bg-primary transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                                 title="Send message"
                             >
-                                <ArrowUp className="w-5 h-5 stroke-[3px]" />
+                                <ArrowUp className="h-5 w-5 stroke-[3px]" />
                             </button>
                         )}
                     </div>
                 </div>
             </div>
-            <div className="text-center text-xs text-text-secondary mt-2">
+            <div className="mt-2 text-center text-xs text-text-secondary">
                 Copilot Desktop can make mistakes. Check important info.
             </div>
         </div>
     );
 };
-

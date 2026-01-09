@@ -25,15 +25,17 @@ class TokenPoolService {
 
     async getAccounts(): Promise<GitHubToken[]> {
         const db = await initDb();
-        const rows = await db.select<any[]>('SELECT * FROM github_accounts ORDER BY is_primary DESC, last_used_at ASC');
-        return rows.map(row => ({
+        const rows = await db.select<any[]>(
+            'SELECT * FROM github_accounts ORDER BY is_primary DESC, last_used_at ASC'
+        );
+        return rows.map((row) => ({
             id: row.id,
             accessToken: row.access_token,
             username: row.username,
             avatarUrl: row.avatar_url,
             isPrimary: Boolean(row.is_primary),
             rateLimitRemaining: row.rate_limit_remaining,
-            lastUsed: row.last_used_at ? new Date(row.last_used_at) : null
+            lastUsed: row.last_used_at ? new Date(row.last_used_at) : null,
         }));
     }
 
@@ -44,7 +46,7 @@ class TokenPoolService {
         // Strategy:
         // 1. Check local load
         const loadMap = new Map<string, number>();
-        tokens.forEach(t => loadMap.set(t.id, 0));
+        tokens.forEach((t) => loadMap.set(t.id, 0));
         this.activeRequests.forEach((tokenId) => {
             loadMap.set(tokenId, (loadMap.get(tokenId) || 0) + 1);
         });
@@ -68,15 +70,24 @@ class TokenPoolService {
         this.activeRequests.delete(chatId);
     }
 
-    async addAccount(account: { username: string; access_token: string; avatar_url: string; is_primary?: boolean }): Promise<void> {
+    async addAccount(account: {
+        username: string;
+        access_token: string;
+        avatar_url: string;
+        is_primary?: boolean;
+    }): Promise<void> {
         const db = await initDb();
 
         // Check if exists
-        const existing = await db.select<any[]>('SELECT id FROM github_accounts WHERE username = ?', [account.username]);
+        const existing = await db.select<any[]>('SELECT id FROM github_accounts WHERE username = ?', [
+            account.username,
+        ]);
         if (existing.length > 0) {
             // Update
-            await db.execute('UPDATE github_accounts SET access_token = ?, avatar_url = ? WHERE username = ?',
-                [account.access_token, account.avatar_url, account.username]);
+            await db.execute(
+                'UPDATE github_accounts SET access_token = ?, avatar_url = ? WHERE username = ?',
+                [account.access_token, account.avatar_url, account.username]
+            );
             return;
         }
 
@@ -102,12 +113,17 @@ class TokenPoolService {
 
     async updateRateLimit(id: string, remaining: number): Promise<void> {
         const db = await initDb();
-        await db.execute('UPDATE github_accounts SET rate_limit_remaining = ? WHERE id = ?', [remaining, id]);
+        await db.execute('UPDATE github_accounts SET rate_limit_remaining = ? WHERE id = ?', [
+            remaining,
+            id,
+        ]);
     }
 
     async updateLastUsed(accountId: string): Promise<void> {
         const db = await initDb();
-        await db.execute('UPDATE github_accounts SET last_used_at = CURRENT_TIMESTAMP WHERE id = ?', [accountId]);
+        await db.execute('UPDATE github_accounts SET last_used_at = CURRENT_TIMESTAMP WHERE id = ?', [
+            accountId,
+        ]);
     }
 
     async getTokenStatus(): Promise<TokenStatus[]> {
@@ -117,12 +133,12 @@ class TokenPoolService {
             loadMap.set(tokenId, (loadMap.get(tokenId) || 0) + 1);
         });
 
-        return tokens.map(t => ({
+        return tokens.map((t) => ({
             id: t.id,
             username: t.username,
             inUse: loadMap.get(t.id) || 0,
             rateLimit: t.rateLimitRemaining,
-            isPrimary: t.isPrimary
+            isPrimary: t.isPrimary,
         }));
     }
 }

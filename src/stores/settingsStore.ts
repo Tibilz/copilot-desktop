@@ -31,5 +31,5 @@ export const useSettingsStore = create<SettingsState>((set) => ({
             await db.execute('INSERT INTO settings (key, value) VALUES (?, ?)', ['theme', theme]);
         }
         set({ theme });
-    }
+    },
 }));
