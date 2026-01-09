@@ -9,38 +9,38 @@ const TOKEN_URL = 'https://github.com/login/oauth/access_token';
 */
 
 export interface DeviceCodeResponse {
-    device_code: string;
-    user_code: string;
-    verification_uri: string;
-    expires_in: number;
-    interval: number;
+  device_code: string;
+  user_code: string;
+  verification_uri: string;
+  expires_in: number;
+  interval: number;
 }
 
 export interface TokenResponse {
-    access_token?: string;
-    error?: string;
-    error_description?: string;
-    token_type?: string;
-    scope?: string;
+  access_token?: string;
+  error?: string;
+  error_description?: string;
+  token_type?: string;
+  scope?: string;
 }
 
 export interface GitHubUser {
-    login: string;
-    avatar_url: string;
-    name: string;
+  login: string;
+  avatar_url: string;
+  name: string;
 }
 
 export const initiateDeviceFlow = async (): Promise<DeviceCodeResponse> => {
-    // MOCK FOR DEBUGGING
-    console.log('[GitHubAuth] MOCKING device flow...');
-    await new Promise((r) => setTimeout(r, 1000));
-    return {
-        device_code: 'mock_device_code_' + Math.random(),
-        user_code: 'AAAA-BBBB',
-        verification_uri: 'https://github.com/login/device',
-        expires_in: 900,
-        interval: 5,
-    };
+  // MOCK FOR DEBUGGING
+  console.log('[GitHubAuth] MOCKING device flow...');
+  await new Promise((r) => setTimeout(r, 1000));
+  return {
+    device_code: 'mock_device_code_' + Math.random(),
+    user_code: 'AAAA-BBBB',
+    verification_uri: 'https://github.com/login/device',
+    expires_in: 900,
+    interval: 5,
+  };
 };
 
 /*
@@ -98,19 +98,19 @@ export const initiateDeviceFlow = async (): Promise<DeviceCodeResponse> => {
 */
 
 export const pollForToken = async (_deviceCode: string): Promise<TokenResponse> => {
-    console.log('[GitHubAuth] Polling for token... (MOCKED)');
-    await new Promise((r) => setTimeout(r, 1000));
+  console.log('[GitHubAuth] Polling for token... (MOCKED)');
+  await new Promise((r) => setTimeout(r, 1000));
 
-    // Test logic
-    const w = window as any;
-    w._pollCount = (w._pollCount || 0) + 1;
+  // Test logic
+  const w = window as any;
+  w._pollCount = (w._pollCount || 0) + 1;
 
-    if (w._pollCount < 3) return { error: 'authorization_pending' };
-    return { access_token: 'mock_token_' + Math.random(), scope: 'copilot', token_type: 'bearer' };
+  if (w._pollCount < 3) return { error: 'authorization_pending' };
+  return { access_token: 'mock_token_' + Math.random(), scope: 'copilot', token_type: 'bearer' };
 };
 
 export const fetchUser = async (_token: string): Promise<GitHubUser> => {
-    return { login: 'MockUser', name: 'Mock User', avatar_url: '' };
+  return { login: 'MockUser', name: 'Mock User', avatar_url: '' };
 };
 
 /* ORIGINALS DISABLED
