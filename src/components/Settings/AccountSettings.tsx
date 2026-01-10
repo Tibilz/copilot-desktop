@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 import { tokenPool, GitHubToken, TokenStatus } from '../../services/tokenPool';
 import { useAuthStore } from '../../stores/authStore';
 import { LoginFlow } from '../Auth/LoginFlow';
-import { Plus, Trash2, Star, Moon, Sun, Monitor } from 'lucide-react';
+import { LogOut, Plus, Trash2, Star, Moon, Sun, Monitor } from 'lucide-react';
 import { useSettingsStore } from '../../stores/settingsStore';
 
 export const AccountSettings = () => {
     const [accounts, setAccounts] = useState<GitHubToken[]>([]);
     const [statusMap, setStatusMap] = useState<Record<string, TokenStatus>>({});
-    const { startLogin, deviceFlow } = useAuthStore();
+    const { startLogin, deviceFlow, logout, user, loading } = useAuthStore();
     const [isAdding, setIsAdding] = useState(false);
     const { theme, setTheme } = useSettingsStore();
 
@@ -33,9 +33,15 @@ export const AccountSettings = () => {
         startLogin();
     };
 
-    const handleRemove = async (id: string) => {
+    const handleRemove = async (id: string, username: string) => {
         await tokenPool.removeAccount(id);
-        loadAccounts();
+        
+        // If we removed the currently active user, we must logout
+        if (user?.login === username) {
+            logout();
+        } else {
+            loadAccounts();
+        }
     };
 
     const handleSetPrimary = async (id: string) => {
@@ -98,7 +104,7 @@ export const AccountSettings = () => {
                                             <Star className="w-4 h-4" />
                                         </button>
                                     )}
-                                    <button onClick={() => handleRemove(acc.id)} className="p-1.5 text-text-secondary hover:text-red-500" title="Entfernen">
+                                    <button onClick={() => handleRemove(acc.id, acc.username)} className="p-1.5 text-text-secondary hover:text-red-500" title="Entfernen">
                                         <Trash2 className="w-4 h-4" />
                                     </button>
                                 </div>
@@ -107,7 +113,11 @@ export const AccountSettings = () => {
                     })}
                 </div>
 
-                {isAdding && deviceFlow ? (
+                {isAdding && loading && !deviceFlow ? (
+                    <div className="flex items-center justify-center p-4 text-text-secondary">
+                        <span className="animate-pulse">Verbinde mit GitHub...</span>
+                    </div>
+                ) : isAdding && deviceFlow ? (
                     <div className="mb-4">
                         <LoginFlow />
                     </div>
@@ -120,6 +130,17 @@ export const AccountSettings = () => {
                         Weiteren Account verbinden
                     </button>
                 )}
+            </div>
+
+            <div className="p-4 bg-bg-secondary rounded-lg border border-border">
+                <h3 className="text-lg font-medium text-text-primary mb-4">Aktionen</h3>
+                <button
+                    onClick={logout}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-lg transition-colors w-full justify-center font-medium"
+                >
+                    <LogOut size={16} />
+                    Abmelden (Logout)
+                </button>
             </div>
         </div>
     );

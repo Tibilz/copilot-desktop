@@ -24,7 +24,7 @@ function App() {
     }
   }, [theme]);
 
-  if (loading) {
+  if (loading && !isAuthenticated && !token && !useAuthStore.getState().deviceFlow) {
     return <div className="h-screen w-screen bg-bg-primary flex items-center justify-center">Loading...</div>;
   }
 
