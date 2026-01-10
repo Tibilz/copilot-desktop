@@ -1,53 +1,36 @@
-# Feature: UI Polish
+# Feature: UI Polish & Enhanced Features
 
-> Branch: `feature/ui-polish`
-> Erstellt: 10. Januar 2026
-> Status: 🟡 Geplant
+> Branch: `feature/ui-polish-fixes`
+> Status: 🟡 In Arbeit
+> Update: 10. Januar 2026 (Updated)
 
 ---
 
 ## 🎯 Ziel
 
-Visuelles Aufwerten der App, um näher an das originale ChatGPT Desktop Feeling zu kommen. Fokus auf Layout, Spacing, Icons und Animationen.
+Behebung verbleibender UX/UI Bugs und Implementierung erweiterter Funktionen (Drag & Drop, Project Memory, Input Tools).
 
 ---
 
 ## 📋 Anforderungen
 
-### Layout
-- [ ] Sidebar Breite anpassbar oder fixe saubere Breite (260px).
-- [ ] Chat-Area zentriert mit `max-width` (ähnlich wie ChatGPT "text container").
-- [ ] Message Bubbles Styling verbessern (Avatar oben/links, Markdown sauber rendern).
+### 1. 📂 Projekt-Management (Enhanced)
+- [ ] **Drag & Drop:** Chats können per Drag & Drop in Projekt-Ordner gezogen werden.
+- [ ] **Modal Fix:** "+" Button nutzt Modal statt `prompt()`.
+- [ ] **"Haupt-Chat" (Project Memory):**
+  - Innerhalb eines Projekts gibt es eine Möglichkeit, mit dem Kontext **aller** enthaltenen Chats zu schreiben.
+  - Der "Haupt-Chat" kennt den Inhalt der anderen Chats im Projekt.
 
-### Typografie & Icons
-- [ ] Schriftart: Inter oder System-Font (SF Pro auf Mac).
-- [ ] Lucide Icons durchgängig nutzen.
-- [ ] Font-Sizes anpassen (14px/16px Standard).
+### 2. ⚙️ Einstellungen & Cleanups
+- [ ] **Bereinigung:** Fake Limits, "Active" Labels, Multi-Account entfernen.
 
-### Animationen
-- [ ] Smooth transitions für Sidebar (Hover/Collapse).
-- [ ] Message Streaming Effekt (Cursor blinkt beim Generieren).
+### 3. ⌨️ Input Features (Funktional machen)
+- [ ] **Anhang (Paperclip):** Textdateien (.txt, .md, code) hochladen und als Kontext senden.
+- [ ] **Reasoning (Lightbulb):** Toggle Button. Wenn aktiv -> Modellwechsel zu `o1-preview` (oder Prompt-Anweisung "Think step by step").
+- [ ] **Web (Globe):** Toggle Button. Markiert Request für Web-Suche (Mock/System Prompt Flag vorerst, da keine Such-API).
 
----
-
-## 🎨 UI/UX Details
-
-### Chat Message
-```
-[Avatar]  User Name
-          Message Content...
-          ...Markdown...
-          
-          [Copy] [Regenerate] (Hover Actions)
-```
-
-### Input Area
-- Sollte "sticky" unten schweben, aber mit Abstand zum Rand.
-- "Pill Shape" oder "Rounded Rectangle" wie im Original.
+### 4. 🎨 Modelle & Fixes
+- [ ] **Modell-Liste:** Claude 3.5 Sonnet, o1-preview hinzufügen.
+- [ ] **Swarm:** Button ausblenden.
 
 ---
-
-## ✅ Akzeptanzkriterien
-- [ ] App wirkt nicht mehr wie ein "Wireframe".
-- [ ] Markdown (Code-Blöcke) sieht sauber aus (Syntax Highlighting).
-- [ ] Input Field wächst mit Text (Auto-resize textarea).

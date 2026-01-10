@@ -37,7 +37,7 @@ function App() {
   }
 
   return (
-    <div className="flex h-screen w-screen bg-bg-primary text-text-primary font-sans">
+    <div className="flex h-screen w-full overflow-hidden bg-bg-primary text-text-primary font-sans">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
         <Header />

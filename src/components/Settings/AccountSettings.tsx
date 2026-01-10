@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react';
 import { tokenPool, GitHubToken, TokenStatus } from '../../services/tokenPool';
 import { useAuthStore } from '../../stores/authStore';
-import { LoginFlow } from '../Auth/LoginFlow';
-import { LogOut, Plus, Trash2, Star, Moon, Sun, Monitor } from 'lucide-react';
+import { LogOut, Trash2, Star, Moon, Sun, Monitor } from 'lucide-react';
 import { useSettingsStore } from '../../stores/settingsStore';
 
 export const AccountSettings = () => {
     const [accounts, setAccounts] = useState<GitHubToken[]>([]);
     const [statusMap, setStatusMap] = useState<Record<string, TokenStatus>>({});
-    const { startLogin, deviceFlow, logout, user, loading } = useAuthStore();
-    const [isAdding, setIsAdding] = useState(false);
+    const { logout, user } = useAuthStore();
     const { theme, setTheme } = useSettingsStore();
 
     const loadAccounts = async () => {
@@ -26,16 +24,11 @@ export const AccountSettings = () => {
         loadAccounts();
         const interval = setInterval(loadAccounts, 5000); // Poll for updates
         return () => clearInterval(interval);
-    }, [deviceFlow]); // Reload when flow changes (login completes)
-
-    const handleAddAccount = () => {
-        setIsAdding(true);
-        startLogin();
-    };
+    }, []);
 
     const handleRemove = async (id: string, username: string) => {
         await tokenPool.removeAccount(id);
-        
+
         // If we removed the currently active user, we must logout
         if (user?.login === username) {
             logout();
@@ -93,9 +86,6 @@ export const AccountSettings = () => {
                                             <span className="font-medium text-text-primary">{acc.username}</span>
                                             {acc.isPrimary && <span className="text-xs bg-accent/20 text-accent px-1.5 py-0.5 rounded">Primary</span>}
                                         </div>
-                                        <div className="text-xs text-text-secondary">
-                                            Limit: {status?.rateLimit}/5000 • Active: {status?.inUse}
-                                        </div>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -112,24 +102,6 @@ export const AccountSettings = () => {
                         );
                     })}
                 </div>
-
-                {isAdding && loading && !deviceFlow ? (
-                    <div className="flex items-center justify-center p-4 text-text-secondary">
-                        <span className="animate-pulse">Verbinde mit GitHub...</span>
-                    </div>
-                ) : isAdding && deviceFlow ? (
-                    <div className="mb-4">
-                        <LoginFlow />
-                    </div>
-                ) : (
-                    <button
-                        onClick={handleAddAccount}
-                        className="w-full py-2 border border-dashed border-border rounded text-text-secondary hover:text-text-primary hover:bg-bg-primary flex items-center justify-center gap-2"
-                    >
-                        <Plus className="w-4 h-4" />
-                        Weiteren Account verbinden
-                    </button>
-                )}
             </div>
 
             <div className="p-4 bg-bg-secondary rounded-lg border border-border">

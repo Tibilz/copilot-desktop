@@ -1,20 +1,19 @@
-## Iteration 8.1 - 10. Januar 2026
+# OUTPUT.md
+
+## Iteration: Drag & Drop Fixes
 
 ### Durchgeführte Änderungen
 
-#### 1. Settings (Account Management)
-- **Datei:** `src/components/Settings/AccountSettings.tsx`
-- **Problem:** "Mülleimer" löschte nur den DB-Eintrag, loggte den aktiven User aber nicht aus. "Account hinzufügen" funktionierte nicht, weil das globale Loading-Overlay die UI blockierte.
-- **Lösung:**
-    - `handleRemove`: Prüft nun, ob der gelöschte Account dem aktuellen User entspricht. Wenn ja -> `logout()`.
-    - `Add Account`: UI zeigt nun einen "Verbinde mit GitHub..." Spinner anstelle von gar nichts.
-- **Datei:** `src/App.tsx`
-- **Lösung:** Globales Loading-Overlay wird nun **nur** angezeigt, wenn der User noch NICHT eingeloggt ist. Wenn man eingeloggt ist (z.B. in Settings), darf `authStore.loading` nicht die gesamte App blockieren.
+#### 1. Drag & Drop Stabilität
+- **Datei:** `src/components/Sidebar/ProjectFolder.tsx`
+- **Änderung:** 
+  - `handleDragLeave` Logik verbessert: Prüft nun mittels `contains(relatedTarget)`, ob der Mauszeiger den Container wirklich verlassen hat oder nur auf ein Kind-Element (Text, Icon) gewechselt ist.
+  - `dropEffect = 'move'` in `handleDragOver` explizit gesetzt.
+- **Grund:** Behebt das "Flackern" des Highlight-Status (IsDragOver), wenn man über die Textelemente innerhalb des Projektordners zieht. Dadurch war das Droppen bisher unzuverlässig und erforderte präzises Zielen auf den Rand.
 - **Status:** ✅ Fertig
 
 ### Offene Probleme
 - Keine.
 
 ### Nächste Schritte
-- [ ] Testen: Mülleimer bei aktivem User -> Logout.
-- [ ] Testen: "Weiteren Account verbinden" -> Flow läuft durch ohne Blocking.
+- [ ] Testen ob Chats jetzt flüssig und zuverlässig in Ordner gezogen werden können.

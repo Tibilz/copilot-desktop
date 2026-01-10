@@ -59,7 +59,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             if (token && token.length > 0) {
                 // Optimistically set token
                 set({ token });
-                
+
                 try {
                     const user = await fetchUser(token);
                     console.log('[AuthStore] Valid session for:', user.login);
@@ -76,11 +76,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                     } else {
                         // Network error? Keep token (Offline Mode)
                         console.warn('[AuthStore] Validation error (network?), keeping token.');
-                        set({ 
-                            loading: false, 
-                            isAuthenticated: true, 
+                        set({
+                            loading: false,
+                            isAuthenticated: true,
                             user: { login: 'Offline', name: 'Offline', avatar_url: '' },
-                            error: 'Verbindung fehlgeschlagen (Offline Modus)' 
+                            error: 'Verbindung fehlgeschlagen (Offline Modus)'
                         });
                     }
                 }
@@ -186,17 +186,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                             });
                         } catch (innerError: any) {
                             console.error('[AuthStore] Post-token setup failed:', innerError);
-                            set({ 
-                                error: `Login Setup fehlgeschlagen: ${innerError.message}`, 
-                                loading: false, 
+                            set({
+                                error: `Login Setup fehlgeschlagen: ${innerError.message}`,
+                                loading: false,
                                 deviceFlow: null,
                                 isPolling: false
                             });
                         }
                     } else {
                         // Other errors (e.g. expired_token, access_denied)
-                        set({ 
-                            error: result.error_description || result.error || 'Unknown error during polling', 
+                        set({
+                            error: result.error_description || result.error || 'Unknown error during polling',
                             loading: false,
                             deviceFlow: null,
                             isPolling: false

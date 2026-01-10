@@ -19,10 +19,39 @@ export const ProjectFolder = ({
   onChatClick,
 }: ProjectFolderProps) => {
   const [isOpen, setIsOpen] = useState(true);
-  const { deleteProject } = useProjectStore();
+  const [isDragOver, setIsDragOver] = useState(false);
+  const { deleteProject, moveChat } = useProjectStore();
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    // Prevent flickering when dragging over child elements
+    if (e.currentTarget.contains(e.relatedTarget as Node)) {
+      return;
+    }
+    setIsDragOver(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const chatId = e.dataTransfer.getData('chatId');
+    if (chatId) {
+      await moveChat(chatId, project.id);
+    }
+  };
 
   return (
-    <div className="mb-2">
+    <div 
+      className={`mb-2 rounded-lg transition-colors ${isDragOver ? 'bg-accent/10 border-accent border-dashed border' : ''}`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       <div
         className="group flex cursor-pointer select-none items-center px-2 py-1 text-sm text-text-secondary hover:text-text-primary"
         onClick={() => setIsOpen(!isOpen)}
