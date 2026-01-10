@@ -1,83 +1,61 @@
-# Arbeitsanweisungen: Auth Persistence
+# Arbeitsanweisungen: Mock entfernen & Login Fixen
 
-Hier sind die Implementierungsschritte für den **Code Executor**.
-Bitte arbeite diese Schritte der Reihe nach ab und aktualisiere `OUTPUT.md`.
+Status: **DRINGEND**
+Der User meldet, dass der Login im "Loading..." State hängen bleibt und der Mock-Modus noch aktiv ist.
 
-## 📦 Schritt 1: Rust Dependencies (Backend)
+## 📦 Schritt 1: Mock entfernen & Echten Auth aktivieren
 
-Wir müssen sicherstellen, dass wir auf den System-Keyring zugreifen können.
+Wir müssen den Mock-Code in `src/services/githubAuth.ts` durch die echte Implementierung ersetzen.
 
-1. Öffne `src-tauri/Cargo.toml`.
-2. Füge die dependency `keyring` hinzu:
-   ```toml
-   [dependencies]
-   keyring = "2.3" # Check version
-   # ...
-   ```
-3. Führe `cargo check` im Terminal aus, um zu prüfen, ob es kompiliert.
-
-## 🦀 Schritt 2: Rust Commands implementieren
-
-Wir brauchen 3 Commands in Rust, um das Token zu verwalten.
-
-1. Bearbeite `src-tauri/src/lib.rs`.
-2. Implementiere folgende Funktionen und registriere sie im `invoke_handler`:
-   
-   ```rust
-   use keyring::Entry;
-
-   #[tauri::command]
-   fn save_token(service: &str, user: &str, token: &str) -> Result<(), String> {
-       let entry = Entry::new(service, user).map_err(|e| e.to_string())?;
-       entry.set_password(token).map_err(|e| e.to_string())?;
-       Ok(())
-   }
-
-   #[tauri::command]
-   fn get_token(service: &str, user: &str) -> Result<Option<String>, String> {
-       let entry = Entry::new(service, user).map_err(|e| e.to_string())?;
-       match entry.get_password() {
-           Ok(t) => Ok(Some(t)),
-           Err(keyring::Error::NoEntry) => Ok(None),
-           Err(e) => Err(e.to_string()),
-       }
-   }
-
-   #[tauri::command]
-   fn delete_token(service: &str, user: &str) -> Result<(), String> {
-       let entry = Entry::new(service, user).map_err(|e| e.to_string())?;
-       // Ignore if not exists
-       let _ = entry.delete_password();
-       Ok(())
-   }
-   ```
-3. Vergiss nicht das `#[tauri::command]` Makro und die Registrierung in `tauri::Builder`.
-
-## ⚛️ Schritt 3: Auth Store anpassen (Frontend)
-
-Jetzt verbinden wir das Frontend mit den neuen Rust Commands.
-
-1. Bearbeite `src/stores/authStore.ts`.
-2. Konstanten definieren (falls noch nicht da):
+1. Öffne `src/services/githubAuth.ts`.
+2. **Import aktivieren:**
    ```typescript
-   const SERVICE = "copilot-desktop";
-   const USER_KEY = "user_token";
+   import { fetch } from '@tauri-apps/plugin-http';
    ```
-3. Aktualisiere `startLogin` / `confirmLogin`:
-   - Wenn Token empfangen wird -> `invoke('save_token', { service: SERVICE, user: USER_KEY, token })`.
-4. Aktualisiere `logout`:
-   - `invoke('delete_token', ...)`
-   - State resetten.
-5. Stelle sicher, dass `checkAuth` beim App-Start aufgerufen wird (passiert evtl. schon in `Sidebar` oder `App.tsx`? Prüfen!).
+3. **Konstanten aktivieren:**
+   ```typescript
+   const CLIENT_ID = 'Iv1.b507a08c87ecfe98'; // VS Code Copilot Client ID
+   const DEVICE_CODE_URL = 'https://github.com/login/device/code';
+   const TOKEN_URL = 'https://github.com/login/oauth/access_token';
+   const USER_URL = 'https://api.github.com/user';
+   ```
+4. **`initiateDeviceFlow` implementieren:**
+   - Entferne den Mock-Code (setTimeout etc.).
+   - Mache einen echten POST Request an `DEVICE_CODE_URL`.
+   - Body: `{ client_id: CLIENT_ID, scope: 'read:user copilot' }`.
+   - Header: `Accept: application/json`.
+   - Returniere die echten Daten (`device_code`, `user_code` etc.).
 
-## 🧪 Schritt 4: UI Prüfung
+5. **`pollForToken` implementieren:**
+   - Diese Funktion fehlt oder ist gemockt? Sie muss exportiert werden!
+   - POST an `TOKEN_URL`.
+   - Body: `{ client_id: CLIENT_ID, device_code, grant_type: 'urn:ietf:params:oauth:grant-type:device_code' }`.
+   - Returniere JSON.
 
-1. Prüfe `src/components/Auth/LoginFlow.tsx`.
-2. Zeige einen `Loading...`-Spinner an, solange `loading` true ist (während `checkAuth` läuft), damit der Login-Button nicht kurz sichtbar ist, wenn man eigentlich eingeloggt ist.
+6. **`fetchUser` implementieren:**
+   - GET an `USER_URL`.
+   - Header: `Authorization: Bearer <token>`, `User-Agent: copilot-desktop`.
 
----
+## 🐛 Schritt 2: Loading State Bug beheben
 
-**Wenn fertig:**
-- Starte App: `pnpm tauri dev`
-- Teste Login -> Neustart -> Logout -> Neustart.
-- Schreibe `OUTPUT.md`.
+Wenn der Click auf "Login" in "Loading..." hängen bleibt, wird `loading` nie auf `false` gesetzt bei Fehler.
+
+1. Öffne `src/stores/authStore.ts`.
+2. Prüfe `startLogin`:
+   - Stelle sicher, dass im `catch`-Block `loading: false` gesetzt wird (sollte schon sein, aber bitte prüfen).
+   - Logge den genauen Fehler, falls `initiateDeviceFlow` rejected.
+3. Prüfe `checkAuth`:
+   - Stelle sicher, dass auch im Fehlerfall (z.B. network error beim User-Fetch) `loading: false` gesetzt wird.
+
+## 🧪 Schritt 3: Verifikation
+
+1. Starte `pnpm tauri dev`.
+2. Klicke "Login with GitHub".
+   - **Erwartung:** Es sollte KEIN 1-Sekunden Mock-Delay sein, sondern ein echter Network-Request.
+   - **Erwartung:** Code und Link sollten erscheinen.
+3. Klicke NICHT auf den Link, warte kurz -> Sollte nicht abstürzen.
+4. Klicke "Abbrechen" -> Sollte Loading beenden.
+
+## 📝 OUTPUT.md Update
+
+Dokumentiere genau, dass der Mock entfernt wurde und welche Dateien geändert wurden.

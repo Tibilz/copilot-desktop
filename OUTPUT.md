@@ -1,44 +1,20 @@
-# OUTPUT.md - Änderungs-Dokumentation
-
-> Diese Datei wird vom Code-Executor Agent nach jeder Iteration neu geschrieben.
-
----
-
-## Iteration 7 - [Datum eintragen]
-
-### Status: ⏳ Noch nicht gestartet
-
----
+## Iteration 8.1 - 10. Januar 2026
 
 ### Durchgeführte Änderungen
 
-_Hier dokumentiert der Code-Executor alle Änderungen..._
-
-#### 1. [Komponente/Feature]
-- **Datei(en):** `src/path/to/file.ts`
-- **Änderung:** Beschreibung
-- **Grund:** Warum
-- **Status:** ✅ / ⚠️ / ❌
-
----
+#### 1. Settings (Account Management)
+- **Datei:** `src/components/Settings/AccountSettings.tsx`
+- **Problem:** "Mülleimer" löschte nur den DB-Eintrag, loggte den aktiven User aber nicht aus. "Account hinzufügen" funktionierte nicht, weil das globale Loading-Overlay die UI blockierte.
+- **Lösung:**
+    - `handleRemove`: Prüft nun, ob der gelöschte Account dem aktuellen User entspricht. Wenn ja -> `logout()`.
+    - `Add Account`: UI zeigt nun einen "Verbinde mit GitHub..." Spinner anstelle von gar nichts.
+- **Datei:** `src/App.tsx`
+- **Lösung:** Globales Loading-Overlay wird nun **nur** angezeigt, wenn der User noch NICHT eingeloggt ist. Wenn man eingeloggt ist (z.B. in Settings), darf `authStore.loading` nicht die gesamte App blockieren.
+- **Status:** ✅ Fertig
 
 ### Offene Probleme
-
-_Liste aller Probleme die während der Implementierung aufgetreten sind..._
-
----
+- Keine.
 
 ### Nächste Schritte
-
-- [ ] Nächster Task 1
-- [ ] Nächster Task 2
-
----
-
-### Notizen für den Entwickler
-
-_Wichtige Hinweise, Beobachtungen, oder Fragen an den Entwickler..._
-
----
-
-**Zuletzt aktualisiert:** [Timestamp]
+- [ ] Testen: Mülleimer bei aktivem User -> Logout.
+- [ ] Testen: "Weiteren Account verbinden" -> Flow läuft durch ohne Blocking.

@@ -17,36 +17,29 @@ function App() {
 
   useEffect(() => {
     const root = document.documentElement;
-    if (
-      theme === 'dark' ||
-      (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
-    ) {
+    if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       root.classList.add('dark');
     } else {
       root.classList.remove('dark');
     }
   }, [theme]);
 
-  if (loading) {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center bg-bg-primary">
-        Loading...
-      </div>
-    );
+  if (loading && !isAuthenticated && !token && !useAuthStore.getState().deviceFlow) {
+    return <div className="h-screen w-screen bg-bg-primary flex items-center justify-center">Loading...</div>;
   }
 
   if (!isAuthenticated && !token) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-bg-primary">
+      <div className="h-screen w-screen bg-bg-primary flex items-center justify-center">
         <LoginFlow />
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen w-screen bg-bg-primary font-sans text-text-primary">
+    <div className="flex h-screen w-screen bg-bg-primary text-text-primary font-sans">
       <Sidebar />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         <Header />
         <ChatView />
       </div>
