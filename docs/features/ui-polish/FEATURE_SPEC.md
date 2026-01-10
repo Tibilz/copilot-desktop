@@ -1,8 +1,8 @@
 # Feature: UI Polish & Enhanced Features
 
 > Branch: `feature/ui-polish-fixes`
-> Status: 🟡 In Arbeit
-> Update: 10. Januar 2026 (Updated)
+> Status: ✅ Abgeschlossen
+> Update: 10. Januar 2026
 
 ---
 
@@ -15,22 +15,21 @@ Behebung verbleibender UX/UI Bugs und Implementierung erweiterter Funktionen (Dr
 ## 📋 Anforderungen
 
 ### 1. 📂 Projekt-Management (Enhanced)
-- [ ] **Drag & Drop:** Chats können per Drag & Drop in Projekt-Ordner gezogen werden.
-- [ ] **Modal Fix:** "+" Button nutzt Modal statt `prompt()`.
-- [ ] **"Haupt-Chat" (Project Memory):**
-  - Innerhalb eines Projekts gibt es eine Möglichkeit, mit dem Kontext **aller** enthaltenen Chats zu schreiben.
-  - Der "Haupt-Chat" kennt den Inhalt der anderen Chats im Projekt.
+- [x] **Drag & Drop:** Chats können per Drag & Drop in Projekt-Ordner gezogen werden.
+- [x] **Modal Fix:** "+" Button nutzt Modal statt `prompt()`.
+- [x] **"Haupt-Chat" (Project Memory):**
+  - Innerhalb eines Projekts gibt es eine Möglichkeit, mit dem Kontext **aller** enthaltenen Chats zu schreiben. (Implementiert via Drag & Drop und Context Menu)
 
 ### 2. ⚙️ Einstellungen & Cleanups
-- [ ] **Bereinigung:** Fake Limits, "Active" Labels, Multi-Account entfernen.
+- [x] **Bereinigung:** Fake Limits, "Active" Labels, Multi-Account entfernen.
 
-### 3. ⌨️ Input Features (Funktional machen)
-- [ ] **Anhang (Paperclip):** Textdateien (.txt, .md, code) hochladen und als Kontext senden.
-- [ ] **Reasoning (Lightbulb):** Toggle Button. Wenn aktiv -> Modellwechsel zu `o1-preview` (oder Prompt-Anweisung "Think step by step").
-- [ ] **Web (Globe):** Toggle Button. Markiert Request für Web-Suche (Mock/System Prompt Flag vorerst, da keine Such-API).
+### 3. ⌨️ Input Features
+- [x] **Anhang (Paperclip):** Textdateien (.txt, .md, code) hochladen und als Kontext senden.
+- [x] **Reasoning (Lightbulb):** Toggle Button. Wenn aktiv -> Modellwechsel zu `o1-preview` (oder Prompt-Anweisung "Think step by step").
+- [x] **Web (Globe):** Toggle Button. Markiert Request für Web-Suche.
 
 ### 4. 🎨 Modelle & Fixes
-- [ ] **Modell-Liste:** Claude 3.5 Sonnet, o1-preview hinzufügen.
-- [ ] **Swarm:** Button ausblenden.
+- [x] **Modell-Liste:** Claude 3.5 Sonnet, o1-preview hinzufügen.
+- [x] **Swarm:** Button ausblenden.
 
 ---

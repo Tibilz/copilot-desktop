@@ -2,14 +2,22 @@
 
 > Ein ChatGPT Desktop UI-Klon, der GitHub Copilot als Backend verwendet.
 
-![Status](https://img.shields.io/badge/Status-In%20Development-yellow)
+![Status](https://img.shields.io/badge/Status-Beta-green)
 ![Tech](https://img.shields.io/badge/Tech-Tauri%202.0%20%7C%20React%20%7C%20TypeScript-blue)
 
 ---
 
 ## 🎯 Projektziel
 
-Eine Desktop-Anwendung, die die ChatGPT Desktop-Oberfläche nachbildet, aber GitHub Copilot als KI-Engine nutzt. Features wie parallele Chats, Multi-Account Token Pool und Swarm Mode (Multi-Agent Orchestration) sind geplant.
+Eine Desktop-Anwendung, die die ChatGPT Desktop-Oberfläche nachbildet, aber GitHub Copilot als KI-Engine nutzt.
+
+**Aktuelle Features:**
+*   **Parallele Chats:** Organisiere deine Konversationen in Projekten.
+*   **Drag & Drop:** Verschiebe Chats einfach in Projekt-Ordner.
+*   **Multi-Model:** Unterstützt GPT-4o, Claude 3.5 Sonnet, o1-preview (sofern verfügbar).
+*   **Token Pool:** Verwalte mehrere GitHub Accounts für erhöhte Rate Limits.
+*   **Input Tools:** Datei-Anhänge, Reasoning Mode und Web-Search-Simulation.
+*   **Persistenz:** Chats und Auth-Tokens werden sicher lokal gespeichert (SQLite + System Keyring).
 
 ---
 
